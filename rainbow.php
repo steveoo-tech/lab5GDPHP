@@ -1,6 +1,6 @@
 <?php
+function createRainbow(){
 
-header('Content-type: image/png');
 $png_image = imagecreate(500, 500);
 $grey = imagecolorallocate($png_image, 229, 229, 229);
 $green = imagecolorallocate($png_image, 128, 204, 204);
@@ -37,5 +37,6 @@ imagefilledarc($png_image, 250, 420, 200, 125, 180, 360, $purple, IMG_ARC_PIE); 
 
 
 
-imagepng($png_image);
+imagepng ($png_image, "rainbow.png", 0);
 imagedestroy($png_image);
+}

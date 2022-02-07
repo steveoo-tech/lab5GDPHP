@@ -1,82 +1,67 @@
 <?php
-include_once 'upload.php';
-//include_once 'textupload2.php';
-?>
+
+require_once("textupload2.php");
+include_once 'thumbnailer.php';
+include_once 'indexHTML.php';
 
 
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-    <style>
-        .container{
-            padding: 20px;
+// Path configuration
+$targetDir = __DIR__;
+
+$statusMsg = '';
+if (isset($_POST["submit"])) {
+    if (!empty($_FILES["file"]["name"])) {
+        // File upload path
+        $fileName =  basename($_FILES["file"]["name"]);
+        $targetFilePath = $targetDir .'\uploads\\'. $fileName;
+        $fileType = pathinfo($targetFilePath, PATHINFO_EXTENSION);
+
+        // Allow certain file formats
+        $allowTypes = array('jpg', 'png', 'jpeg');
+        if (in_array($fileType, $allowTypes)) {
+            // Upload file to the server
+            if (move_uploaded_file($_FILES["file"]["tmp_name"], $targetFilePath)) {
+                // Load the stamp and the photo to apply the watermark to
+                switch ($fileType) {
+                    case 'jpg':
+                        $im = imagecreatefromjpeg($targetFilePath);
+                        break;
+                    case 'jpeg':
+                        $im = imagecreatefromjpeg($targetFilePath);
+                        break;
+                    case 'png':
+                        $im = imagecreatefrompng($targetFilePath);
+                        break;
+                    default:
+                        $im = imagecreatefromjpeg($targetFilePath);
+                }
+
+
+                // Save image and free memory
+                imagepng($im, $targetFilePath);
+                imagedestroy($im);
+
+                thumbnailer($targetFilePath);
+                $DestinationFile = $targetDir . "\watermarked\\" . $fileName;
+                echo "<h2>Watermarked</h2><img src='./watermarked/$fileName' height='800'>";
+                $WaterMarkText = $_POST["subject"];
+                watermarkImage ($targetFilePath, $WaterMarkText, $DestinationFile);
+
+                if (file_exists($targetFilePath)) {
+                    $statusMsg = "The image with watermark has been uploaded successfully.";
+                } else {
+                    $statusMsg = "Image upload failed, please try again.";
+                }
+            } else {
+                $statusMsg = "Sorry, there was an error uploading your file.";
+            }
+        } else {
+            $statusMsg = 'Sorry, only JPG, JPEG, and PNG files are allowed to upload.';
         }
+    } else {
+        $statusMsg = 'Please select a file to upload.';
+    }
+}
 
-        .status {
-            font-size:16px;
-            padding: 10px;
-            border: 1px dashed;
-            margin-bottom: 10px;
-        }
-
-        .gallery {
-            width: 100%;
-            text-align: center;
-        }
-
-        h5 {
-            color: blue;
-            font-size: 18px;
-            text-transform: uppercase;
-            background: #edeaea
-            padding: 7px 5px 4px 5px;
-            margin-top: 20px;
-        }
-
-        .gallery img {
-            max-width: 100%;
-            padding: 10px;
-        }
-    </style>
-</head>
-<body>
-
-<div class ="container">
-
-    <div class="status">
-        <?php echo !empty($statusMsg)?$statusMsg:''; ?>
-    </div>
-
-    //IMAGE UPLOAD
-    <form action="upload.php" method="post" enctype="multipart/form-data">
-        Select Image File to Upload:
-        <input type="file" name="file">
-        <input type="submit" name="submit" value="Upload">
-    </form>
-
-
-    // TEXT UPLOAD
-    <form name="form" action="" method="post">
-        Insert Text to Watermark:
-        <input type="text" name="subject" id="subject" value="Car Loan">
-        <input type="submit" name="submit2" value="Insert">
-    </form>
-
-
-</div>
-
-
-<?php if(!empty($uploadedFileName)) { ?>
-<h5>Watermarked Image</h5>
-    <div class="gallery">
-        <img src="<?php echo 'uploads/' .$uploadedFileName; ?>" alt="">
-    </div>
-<?php } ?>
-
-</body>
-</html>
+// Display status message
+echo $statusMsg;
