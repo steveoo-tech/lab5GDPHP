@@ -7,7 +7,7 @@ function watermarkImage ($SourceFile, $WaterMarkText, $DestinationFile) {
     imagecopyresampled($image_p, $image, 0, 0, 0, 0, $width, $height, $width, $height);
     $red = imagecolorallocatealpha($image_p, 255, 0, 0, 93);
     $font = '/Applications/MAMP/htdocs/lab5GraphicsWithPhp/arial/arial.ttf';
-    $fontWin = __DIR__ . '\arial\arial.ttf';
+    $fontWin = __DIR__ . '/arial/arial.ttf';
     $font_size = 90;
     $x = 100;
     $y = 300;

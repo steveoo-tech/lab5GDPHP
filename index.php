@@ -13,7 +13,7 @@ if (isset($_POST["submit"])) {
     if (!empty($_FILES["file"]["name"])) {
         // File upload path
         $fileName =  basename($_FILES["file"]["name"]);
-        $targetFilePath = $targetDir .'\uploads\\'. $fileName;
+        $targetFilePath = $targetDir .'/uploads/'. $fileName;
         $fileType = pathinfo($targetFilePath, PATHINFO_EXTENSION);
 
         // Allow certain file formats
@@ -42,7 +42,7 @@ if (isset($_POST["submit"])) {
                 imagedestroy($im);
 
                 thumbnailer($targetFilePath);
-                $DestinationFile = $targetDir . "\watermarked\\" . $fileName;
+                $DestinationFile = $targetDir . "/watermarked/" . $fileName;
                 echo "<h2>Watermarked</h2><img src='./watermarked/$fileName' height='800'>";
                 $WaterMarkText = $_POST["subject"];
                 watermarkImage ($targetFilePath, $WaterMarkText, $DestinationFile);
